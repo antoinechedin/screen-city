@@ -6,11 +6,19 @@ using UnityEngine;
 public class BuildingSystem : MonoBehaviour
 {
     public GameObject prefab;
+    public Material buildMaterial;
+    public Material cantBuildMaterial;
     public LayerMask worldMask;
     public float buildDistance;
 
     GameObject currentObj;
-    float objSize = 3;
+    float objSize;
+    bool canBuild;
+
+    private void Start()
+    {
+        objSize = prefab.transform.localScale.x;
+    }
 
     void Update()
     {
@@ -52,7 +60,7 @@ public class BuildingSystem : MonoBehaviour
 
         if (currentObj != null)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && canBuild)
             {
                 currentObj.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
                 currentObj.layer = LayerMask.NameToLayer("World");
@@ -69,19 +77,27 @@ public class BuildingSystem : MonoBehaviour
     private void UpdateObjSize()
     {
         if (currentObj != null)
-                    currentObj.transform.localScale = new Vector3(objSize, objSize, objSize);
-                prefab.transform.localScale = new Vector3(objSize, objSize, objSize);
+            currentObj.transform.localScale = new Vector3(objSize, objSize, objSize);
+        prefab.transform.localScale = new Vector3(objSize, objSize, objSize);
     }
 
     private void SnapObjectToGrid(GameObject obj, RaycastHit hit)
     {
-
         // TODO: For now it only snap to closest integer, change it with the grid system
-        obj.transform.position = new Vector3(Mathf.Round(hit.point.x), Mathf.Round(hit.point.y), Mathf.Round(hit.point.z));
-        Vector3 colliderHalfSize = currentObj.transform.localScale / 2f - Vector3.one * 0.1f;
-        while (Physics.CheckBox(obj.transform.position, colliderHalfSize, Quaternion.identity, worldMask))
+        Vector3 colliderHalfSize = currentObj.transform.localScale / 2f;
+        Vector3 newPosition = hit.point + Vector3.Scale(colliderHalfSize, hit.normal);
+        Vector3 buildPos = new Vector3(Mathf.Round(newPosition.x), Mathf.Round(newPosition.y), Mathf.Round(newPosition.z));
+
+        obj.transform.position = buildPos;
+        if (Physics.CheckBox(obj.transform.position, colliderHalfSize - Vector3.one * 0.1f, Quaternion.identity, worldMask))
         {
-            obj.transform.position += hit.normal;
+            canBuild = false;
+            obj.GetComponent<MeshRenderer>().material = cantBuildMaterial;
+        }
+        else
+        {
+            canBuild = true;
+            obj.GetComponent<MeshRenderer>().material = buildMaterial;
         }
     }
 }

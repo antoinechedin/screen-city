@@ -153,7 +153,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 1580317114288842940, guid: 9151b7543446f7740ab29c18945d16b7, type: 3}
-  buildMask:
+  buildMaterial: {fileID: 2100000, guid: 29444dc8bc3e1fe4fafd67628c00f131, type: 2}
+  cantBuildMaterial: {fileID: 2100000, guid: 034597f3995e06d41b40433c71983662, type: 2}
+  worldMask:
     serializedVersion: 2
     m_Bits: 512
   buildDistance: 20

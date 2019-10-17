@@ -112,35 +112,12 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &507305452 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8225053097964459923, guid: 3a12f678b974ef14baec877f09943547,
-    type: 3}
-  m_PrefabInstance: {fileID: 508633220}
-  m_PrefabAsset: {fileID: 0}
 --- !u!20 &507305455 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 8225053097964459926, guid: 3a12f678b974ef14baec877f09943547,
     type: 3}
   m_PrefabInstance: {fileID: 508633220}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &507305456
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 507305452}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf25400669b64994d8837e4e1713a85f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefab: {fileID: 1580317114288842940, guid: 9151b7543446f7740ab29c18945d16b7, type: 3}
-  buildMask:
-    serializedVersion: 2
-    m_Bits: 512
-  buildDistance: 20
 --- !u!1001 &508633220
 PrefabInstance:
   m_ObjectHideFlags: 0

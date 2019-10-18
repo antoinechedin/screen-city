@@ -18,6 +18,7 @@ public class BuildingSystem : MonoBehaviour
     private void Start()
     {
         objSize = prefab.transform.localScale.x;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
@@ -78,7 +79,7 @@ public class BuildingSystem : MonoBehaviour
         // TODO: For now it only snap to closest integer, change it with the grid system
         Vector3 colliderHalfSize = currentObj.transform.localScale / 2f;
         Vector3 newPosition = hit.point + Vector3.Scale(colliderHalfSize, hit.normal);
-        Vector3 buildPos = new Vector3(Mathf.Round(newPosition.x), Mathf.Round(newPosition.y), Mathf.Round(newPosition.z));
+        Vector3 buildPos = MathUtil.RoundVec3(newPosition, 1);
 
         obj.transform.position = buildPos;
         if (Physics.CheckBox(obj.transform.position, colliderHalfSize - Vector3.one * 0.1f, Quaternion.identity, worldMask))

@@ -23,22 +23,14 @@ public class BuildingSystem : MonoBehaviour
     void Update()
     {
         bool updateSize = false;
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            if (objSize < 7)
-            {
-                objSize += 2f;
-                updateSize = true;
-            }
-        }
 
-        if (Input.GetKeyDown(KeyCode.X))
+        if (Input.mouseScrollDelta.y != 0)
         {
-            if (objSize > 1)
-            {
+            if (Input.mouseScrollDelta.y > 0 && objSize < 7)
+                objSize += 2f;
+            else if (Input.mouseScrollDelta.y < 0 && objSize > 1)
                 objSize -= 2f;
-                updateSize = true;
-            }
+            updateSize = true;
         }
 
         if (updateSize)

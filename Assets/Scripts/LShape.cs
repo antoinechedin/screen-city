@@ -3,23 +3,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
 public class LShape : MonoBehaviour
 {
     private MeshFilter mf;
     private MeshRenderer mr;
+    private MeshCollider mc;
 
     public Vector3 origin;
     public Vector3 size;
+
+    public int numCollision = 0;
 
     private void Awake()
     {
         mf = GetComponent<MeshFilter>();
         mr = GetComponent<MeshRenderer>();
+        mc = GetComponent<MeshCollider>();
         mr.material = new Material(Shader.Find("Diffuse"));
 
         mf.mesh = LShape.BuildMesh(origin, size);
+        mc.sharedMesh = mf.mesh;
     }
+
+    private void OnCollisionEnter(Collision other) {
+        numCollision++;
+        Debug.Log("Enter");
+    }
+
+    private void OnCollisionExit(Collision other) {
+        numCollision--;
+        Debug.Log("Exit");
+    }
+
 
     private static Mesh BuildMesh(Vector3 origin, Vector3 size)
     {

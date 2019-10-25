@@ -43,7 +43,25 @@ public class BuildingSystem : MonoBehaviour
             if (currentObj == null)
                 currentObj = Instantiate(prefab);
 
-            SnapObjectToGrid(currentObj, buildHit);
+            LShape lShape = currentObj.GetComponent<LShape>();
+            currentObj.transform.position = buildHit.point;
+            bool box1 = true;
+            bool box2 = true;
+            box1 = Physics.CheckBox(currentObj.transform.position + new Vector3(lShape.size.x / 2f, 0.05f, lShape.size.z / 2f), new Vector3(lShape.size.x / 2f, 0.05f, lShape.size.z / 2f), Quaternion.identity, worldMask);
+            box2 = Physics.CheckBox(currentObj.transform.position + new Vector3(lShape.size.x / 2f, lShape.size.y / 2f, 0.05f), new Vector3(lShape.size.x / 2f, lShape.size.y / 2f, 0.05f), Quaternion.identity, worldMask);
+            while (box1 || box2)
+            {
+                currentObj.transform.position += 0.01f * (transform.position - buildHit.point).normalized;
+                box1 = Physics.CheckBox(currentObj.transform.position + new Vector3(lShape.size.x / 2f, 0.05f, lShape.size.z / 2f), new Vector3(lShape.size.x / 2f, 0.05f, lShape.size.z / 2f), Quaternion.identity, worldMask);
+                box2 = Physics.CheckBox(currentObj.transform.position + new Vector3(lShape.size.x / 2f, lShape.size.y / 2f, 0.05f), new Vector3(lShape.size.x / 2f, lShape.size.y / 2f, 0.05f), Quaternion.identity, worldMask);
+            }
+
+            // currentObj.transform.position = buildHit.point;
+            // Vector3 colliderHalfSize = currentObj.transform.localScale / 2f;
+            // while (currentObj.GetComponent<LShape>().numCollision > 0){
+            //     currentObj.transform.position += 0.01f * (transform.position - buildHit.point).normalized;
+            // }
+            canBuild = true;
         }
         else
         {
@@ -76,7 +94,7 @@ public class BuildingSystem : MonoBehaviour
 
     private void SnapObjectToGrid(GameObject obj, RaycastHit hit)
     {
-        // TODO: For now it only snap to closest integer, change it with the grid system
+        //TODO: For now it only snap to closest integer, change it with the grid system
         Vector3 colliderHalfSize = currentObj.transform.localScale / 2f;
         Vector3 newPosition = hit.point + Vector3.Scale(colliderHalfSize, hit.normal);
         Vector3 buildPos = MathUtil.RoundVec3(newPosition, 1);
@@ -93,4 +111,5 @@ public class BuildingSystem : MonoBehaviour
             obj.GetComponent<MeshRenderer>().material = buildMaterial;
         }
     }
+
 }

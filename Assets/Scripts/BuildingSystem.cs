@@ -15,10 +15,13 @@ public class BuildingSystem : MonoBehaviour
     float objSize;
     bool canBuild;
 
+    public Quaternion buildOrientation;
+
     private void Start()
     {
         objSize = prefab.transform.localScale.x;
         Cursor.lockState = CursorLockMode.Locked;
+        buildOrientation = Quaternion.identity;
     }
 
     void Update()
@@ -37,30 +40,47 @@ public class BuildingSystem : MonoBehaviour
         if (updateSize)
             UpdateObjSize();
 
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            buildOrientation.eulerAngles += new Vector3(0, 45, 0);
+        }
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            buildOrientation.eulerAngles += new Vector3(0, -45, 0);
+        }
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            buildOrientation.eulerAngles += new Vector3(0, 0, 45);
+        }
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            buildOrientation.eulerAngles += new Vector3(0, 0, -45);
+        }
+
         RaycastHit buildHit;
         if (Physics.Raycast(transform.position, transform.forward, out buildHit, buildDistance, worldMask))
         {
-            if (currentObj == null)
+            if (currentObj == null){
                 currentObj = Instantiate(prefab);
+                currentObj.GetComponent<MeshRenderer>().material = buildMaterial;
+            }
 
             LShape lShape = currentObj.GetComponent<LShape>();
             currentObj.transform.position = buildHit.point;
-            bool box1 = true;
-            bool box2 = true;
-            box1 = Physics.CheckBox(currentObj.transform.position + new Vector3(lShape.size.x / 2f, 0.05f, lShape.size.z / 2f), new Vector3(lShape.size.x / 2f, 0.05f, lShape.size.z / 2f), Quaternion.identity, worldMask);
-            box2 = Physics.CheckBox(currentObj.transform.position + new Vector3(lShape.size.x / 2f, lShape.size.y / 2f, 0.05f), new Vector3(lShape.size.x / 2f, lShape.size.y / 2f, 0.05f), Quaternion.identity, worldMask);
-            while (box1 || box2)
+            currentObj.transform.rotation = buildOrientation;
+            // bool box1 = Physics.CheckBox(currentObj.transform.position + new Vector3(lShape.size.x / 2f, 0.05f, lShape.size.z / 2f), new Vector3(lShape.size.x / 2f, 0.05f, lShape.size.z / 2f), buildOrientation, worldMask);
+            // bool box2 = Physics.CheckBox(currentObj.transform.position + new Vector3(lShape.size.x / 2f, lShape.size.y / 2f, 0.05f), new Vector3(lShape.size.x / 2f, lShape.size.y / 2f, 0.05f), buildOrientation, worldMask);
+            
+            bool box = Physics.CheckBox(currentObj.transform.position, lShape.size / 2.0f * objSize, buildOrientation, worldMask);
+            
+            while (box)
             {
                 currentObj.transform.position += 0.01f * (transform.position - buildHit.point).normalized;
-                box1 = Physics.CheckBox(currentObj.transform.position + new Vector3(lShape.size.x / 2f, 0.05f, lShape.size.z / 2f), new Vector3(lShape.size.x / 2f, 0.05f, lShape.size.z / 2f), Quaternion.identity, worldMask);
-                box2 = Physics.CheckBox(currentObj.transform.position + new Vector3(lShape.size.x / 2f, lShape.size.y / 2f, 0.05f), new Vector3(lShape.size.x / 2f, lShape.size.y / 2f, 0.05f), Quaternion.identity, worldMask);
+                box = Physics.CheckBox(currentObj.transform.position, lShape.size / 2.0f * objSize, buildOrientation, worldMask);
+                // box1 = Physics.CheckBox(currentObj.transform.position + new Vector3(lShape.size.x / 2f, 0.05f, lShape.size.z / 2f), new Vector3(lShape.size.x / 2f, 0.05f, lShape.size.z / 2f), buildOrientation, worldMask);
+                // box2 = Physics.CheckBox(currentObj.transform.position + new Vector3(lShape.size.x / 2f, lShape.size.y / 2f, 0.05f), new Vector3(lShape.size.x / 2f, lShape.size.y / 2f, 0.05f), buildOrientation, worldMask);
             }
 
-            // currentObj.transform.position = buildHit.point;
-            // Vector3 colliderHalfSize = currentObj.transform.localScale / 2f;
-            // while (currentObj.GetComponent<LShape>().numCollision > 0){
-            //     currentObj.transform.position += 0.01f * (transform.position - buildHit.point).normalized;
-            // }
             canBuild = true;
         }
         else
@@ -73,7 +93,7 @@ public class BuildingSystem : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0) && canBuild)
             {
-                currentObj.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
+                currentObj.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
                 currentObj.layer = LayerMask.NameToLayer("World");
                 currentObj = null;
             }
@@ -110,6 +130,16 @@ public class BuildingSystem : MonoBehaviour
             canBuild = true;
             obj.GetComponent<MeshRenderer>().material = buildMaterial;
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        if (currentObj != null)
+        {
+            LShape lShape = currentObj.GetComponent<LShape>();
+            Gizmos.DrawWireCube(currentObj.transform.position + new Vector3(lShape.size.x / 2f, 0.05f, lShape.size.z / 2f), new Vector3(lShape.size.x / 2f, 0.05f, lShape.size.z / 2f));
+    }
     }
 
 }

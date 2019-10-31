@@ -46,8 +46,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 896733068eaffde44b085481bb744b1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  origin: {x: 0, y: 0, z: 0}
-  size: {x: 10, y: 10, z: 10}
+  origin: {x: 0.5, y: 0.5, z: 0.5}
+  size: {x: 1, y: 1, z: 1}
   numCollision: 0
 --- !u!33 &3740585690920965588
 MeshFilter:

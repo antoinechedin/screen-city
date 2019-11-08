@@ -36,6 +36,11 @@ public class LShape : MonoBehaviour
         Debug.Log("Exit");
     }
 
+    public void UpdateMesh()
+    {
+        mf.mesh = LShape.BuildMesh(origin, size);
+        mc.sharedMesh = mf.mesh;
+    }
 
     private static Mesh BuildMesh(Vector3 origin, Vector3 size)
     {

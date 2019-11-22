@@ -15,9 +15,9 @@ TagManager:
   - 
   - PostProcessing
   - World
-  - 
-  - 
-  - 
+  - Boid
+  - Wall
+  - Player
   - 
   - 
   - 

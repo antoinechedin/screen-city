@@ -2,161 +2,120 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class Boid : MonoBehaviour {
 
-public class Boid : MonoBehaviour
-{
-    public BoidPhysics physics;
-    public Vector3 velocity;
+    BoidSettings settings;
 
-    public Transform target;
-    //public Box box;
+    // State
+    [HideInInspector]
+    public Vector3 position;
+    [HideInInspector]
+    public Vector3 forward;
+    Vector3 velocity;
 
-    private void Start()
-    {
-        velocity = new Vector3(
-            Random.Range(-1f, 1f),
-            Random.Range(-1f, 1f),
-            Random.Range(-1f, 1f)
-        ).normalized * (physics.maxSpeed + physics.minSpeed) / 2f;
+    // To update:
+    Vector3 acceleration;
+    [HideInInspector]
+    public Vector3 avgFlockHeading;
+    [HideInInspector]
+    public Vector3 avgAvoidanceHeading;
+    [HideInInspector]
+    public Vector3 centreOfFlockmates;
+    [HideInInspector]
+    public int numPerceivedFlockmates;
+
+    // Cached
+    Material material;
+    Transform cachedTransform;
+    Transform target;
+
+    void Awake () {
+        material = transform.GetComponentInChildren<MeshRenderer> ().material;
+        cachedTransform = transform;
     }
 
-    private void Update()
-    {
+    public void Initialize (BoidSettings settings, Transform target) {
+        this.target = target;
+        this.settings = settings;
+
+        position = cachedTransform.position;
+        forward = cachedTransform.forward;
+
+        float startSpeed = (settings.minSpeed + settings.maxSpeed) / 2;
+        velocity = transform.forward * startSpeed;
+    }
+
+    public void SetColour (Color col) {
+        if (material != null) {
+            material.color = col;
+        }
+    }
+
+    public void UpdateBoid () {
         Vector3 acceleration = Vector3.zero;
 
-        int layerMask = 1 << LayerMask.NameToLayer("Boid");
-        Collider[] neighbors = Physics.OverlapSphere(transform.position, physics.neighborDistance, layerMask);
+        if (target != null) {
+            Vector3 offsetToTarget = (target.position - position);
+            acceleration = SteerTowards (offsetToTarget) * settings.targetWeight;
+        }
 
+        if (numPerceivedFlockmates != 0) {
+            centreOfFlockmates /= numPerceivedFlockmates;
 
-        acceleration += physics.alignementCoef * Alignement(neighbors);
-        acceleration += physics.cohesionCoef * Cohesion(neighbors);
-        acceleration += physics.separationCoef * Separation(neighbors);
-        acceleration += physics.seekCoef * Seek();
+            Vector3 offsetToFlockmatesCentre = (centreOfFlockmates - position);
 
-        // Avoid bounds
-        if (transform.position.x > physics.min.x)
-            acceleration += Steer(transform.position + Vector3.left);
-        if (transform.position.x < physics.max.x)
-            acceleration += Steer(transform.position + Vector3.right);
-        if (transform.position.y > physics.min.y)
-            acceleration += Steer(transform.position + Vector3.down);
-        if (transform.position.y < physics.max.y)
-            acceleration += Steer(transform.position + Vector3.up);
-        if (transform.position.z > physics.min.z)
-            acceleration += Steer(transform.position + Vector3.back);
-        if (transform.position.z < physics.max.z)
-            acceleration += Steer(transform.position + Vector3.forward);
+            var alignmentForce = SteerTowards (avgFlockHeading) * settings.alignWeight;
+            var cohesionForce = SteerTowards (offsetToFlockmatesCentre) * settings.cohesionWeight;
+            var seperationForce = SteerTowards (avgAvoidanceHeading) * settings.seperateWeight;
 
-        velocity += acceleration * Time.deltaTime ;
-        float speed = Mathf.Clamp(velocity.magnitude, physics.minSpeed, physics.maxSpeed);
-        transform.position += velocity.normalized * speed ;
+            acceleration += alignmentForce;
+            acceleration += cohesionForce;
+            acceleration += seperationForce;
+        }
 
-        transform.LookAt(transform.position + velocity);
+        if (IsHeadingForCollision ()) {
+            Vector3 collisionAvoidDir = ObstacleRays ();
+            Vector3 collisionAvoidForce = SteerTowards (collisionAvoidDir) * settings.avoidCollisionWeight;
+            acceleration += collisionAvoidForce;
+        }
 
-        // Teleport boid
-        /*if (transform.position.x > box.size / 2f)
-            transform.position += new Vector3(-box.size, 0, 0);
-        if (transform.position.x < -box.size / 2f)
-            transform.position += new Vector3(box.size, 0, 0);
-        if (transform.position.y > box.size / 2f)
-            transform.position += new Vector3(0, -box.size, 0);
-        if (transform.position.y < -box.size / 2f)
-            transform.position += new Vector3(0, box.size, 0);
-        if (transform.position.z > box.size / 2f)
-            transform.position += new Vector3(0, 0, -box.size);
-        if (transform.position.z < -box.size / 2f)
-            transform.position += new Vector3(0, 0, box.size);*/
+        velocity += acceleration * Time.deltaTime;
+        float speed = velocity.magnitude;
+        Vector3 dir = velocity / speed;
+        speed = Mathf.Clamp (speed, settings.minSpeed, settings.maxSpeed);
+        velocity = dir * speed;
+
+        cachedTransform.position += velocity * Time.deltaTime;
+        cachedTransform.forward = dir;
+        position = cachedTransform.position;
+        forward = dir;
     }
 
-    public Vector3 Alignement(Collider[] neighbors)
-    {
-        Vector3 avgVelocity = Vector3.zero;
-        int numNeighbor = 0;
-        foreach (Collider collider in neighbors)
-        {
-            Boid boid = collider.GetComponent<Boid>();
-            if (boid != this)
-            {
-                avgVelocity += boid.velocity;
-                numNeighbor++;
+    bool IsHeadingForCollision () {
+        RaycastHit hit;
+        if (Physics.SphereCast (position, settings.boundsRadius, forward, out hit, settings.collisionAvoidDst, settings.obstacleMask)) {
+            return true;
+        } else { }
+        return false;
+    }
+
+    Vector3 ObstacleRays () {
+        Vector3[] rayDirections = BoidHelper.directions;
+
+        for (int i = 0; i < rayDirections.Length; i++) {
+            Vector3 dir = cachedTransform.TransformDirection (rayDirections[i]);
+            Ray ray = new Ray (position, dir);
+            if (!Physics.SphereCast (ray, settings.boundsRadius, settings.collisionAvoidDst, settings.obstacleMask)) {
+                return dir;
             }
         }
-        if (numNeighbor > 0)
-        {
-            avgVelocity /= numNeighbor;
-            return Steer(transform.position + avgVelocity);
-        }
-        return Vector3.zero;
+
+        return forward;
     }
 
-    public Vector3 Cohesion(Collider[] neighbors)
-    {
-        Vector3 centerOfNeighbors = Vector3.zero;
-        int numNeighbor = 0;
-        foreach (Collider collider in neighbors)
-        {
-            Boid boid = collider.GetComponent<Boid>();
-            if (boid != this)
-            {
-                centerOfNeighbors += boid.transform.position;
-                numNeighbor++;
-            }
-        }
-        if (numNeighbor > 0)
-        {
-            centerOfNeighbors /= numNeighbor;
-            return Steer(centerOfNeighbors);
-        }
-        return Vector3.zero;
+    Vector3 SteerTowards (Vector3 vector) {
+        Vector3 v = vector.normalized * settings.maxSpeed - velocity;
+        return Vector3.ClampMagnitude (v, settings.maxSteerForce);
     }
 
-    public Vector3 Separation(Collider[] neighbors)
-    {
-        Vector3 centerOfNeighbors = Vector3.zero;
-        int numNeighbor = 0;
-        foreach (Collider collider in neighbors)
-        {
-            Boid boid = collider.GetComponent<Boid>();
-            if (boid != this)
-            {
-                float t = (boid.transform.position - transform.position).magnitude;
-                if (t < physics.separationDistance)
-                {
-                    centerOfNeighbors += boid.transform.position;
-                    numNeighbor++;
-                }
-            }
-        }
-        if (numNeighbor > 0)
-        {
-            centerOfNeighbors /= numNeighbor;
-            return Steer(transform.position - (centerOfNeighbors - transform.position));
-        }
-        return Vector3.zero;
-    }
-
-    private Vector3 Seek()
-    {
-        // GameObject[] targets = GameObject.FindGameObjectsWithTag("Target");
-        // if (targets.Length > 0)
-        // {
-        //     GameObject closer = targets[0];
-        //     for (int i = 1; i < targets.Length; i++)
-        //     {
-        //         if (Vector3.Distance(transform.position, closer.transform.position) > Vector3.Distance(transform.position, targets[i].transform.position))
-        //         {
-        //             closer = targets[i];
-        //         }
-        //     }
-        //     return Steer(closer.transform.position);
-        // }
-        return Vector3.zero;
-    }
-
-    public Vector3 Steer(Vector3 target)
-    {
-        Vector3 desired = (target - transform.position);
-        desired = desired.normalized * physics.maxSpeed - velocity;
-        return Vector3.ClampMagnitude(desired, physics.maxForce);
-    }
 }

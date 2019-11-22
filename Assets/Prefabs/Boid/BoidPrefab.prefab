@@ -9,10 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8249352110007078323}
-  - component: {fileID: 1466116621950872866}
-  - component: {fileID: 2986363994608346029}
+  - component: {fileID: 114190133617543048}
   m_Layer: 10
-  m_Name: Boid
+  m_Name: BoidPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33,21 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &1466116621950872866
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5707448322641057098}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.2
-  m_Height: 0.86
-  m_Direction: 2
-  m_Center: {x: 0, y: 0, z: -0.05}
---- !u!114 &2986363994608346029
+--- !u!114 &114190133617543048
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -59,9 +44,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc3af23094d07694bae31055dcf8aa60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  physics: {fileID: 11400000, guid: c80f4e987878af541a5f0875ebaa0973, type: 2}
-  velocity: {x: 0, y: 0, z: 0}
-  target: {fileID: 0}
+  position: {x: 0, y: 0, z: 0}
+  forward: {x: 0, y: 0, z: 0}
+  avgFlockHeading: {x: 0, y: 0, z: 0}
+  avgAvoidanceHeading: {x: 0, y: 0, z: 0}
+  centreOfFlockmates: {x: 0, y: 0, z: 0}
+  numPerceivedFlockmates: 0
 --- !u!1001 &6192666409652734789
 PrefabInstance:
   m_ObjectHideFlags: 0

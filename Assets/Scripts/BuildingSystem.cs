@@ -2,6 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Windows;
+
+using SFB;
 
 public class BuildingSystem : MonoBehaviour
 {
@@ -17,6 +20,7 @@ public class BuildingSystem : MonoBehaviour
     private bool sizingX = true, sizingY = true, sizingZ = true;
     private List<Tuple<GameObject, bool>> undoHist = new List<Tuple<GameObject, bool>>();
     private List<Tuple<GameObject, bool>> redoHist = new List<Tuple<GameObject, bool>>();
+    private Texture2D myTexture;
 
     public Quaternion buildOrientation;
 
@@ -33,17 +37,27 @@ public class BuildingSystem : MonoBehaviour
         // Undo
         if (Input.GetKeyDown(KeyCode.RightControl) && undoHist.Count > 0)
         {
-            redoHist.Add(new Tuple<GameObject, bool>(undoHist[undoHist.Count-1].Item1, !undoHist[undoHist.Count-1].Item2));
-            undoHist[undoHist.Count-1].Item1.SetActive(!undoHist[undoHist.Count-1].Item2);
-            undoHist.Remove(undoHist[undoHist.Count-1]);
+            redoHist.Add(new Tuple<GameObject, bool>(undoHist[undoHist.Count - 1].Item1, !undoHist[undoHist.Count - 1].Item2));
+            undoHist[undoHist.Count - 1].Item1.SetActive(!undoHist[undoHist.Count - 1].Item2);
+            undoHist.Remove(undoHist[undoHist.Count - 1]);
         }
 
         // Redo
         if (Input.GetKeyDown(KeyCode.RightShift) && redoHist.Count > 0)
         {
-            undoHist.Add(new Tuple<GameObject, bool>(redoHist[redoHist.Count-1].Item1, !redoHist[redoHist.Count-1].Item2));
-            redoHist[redoHist.Count-1].Item1.SetActive(!redoHist[redoHist.Count-1].Item2);
-            redoHist.Remove(redoHist[redoHist.Count-1]);
+            undoHist.Add(new Tuple<GameObject, bool>(redoHist[redoHist.Count - 1].Item1, !redoHist[redoHist.Count - 1].Item2));
+            redoHist[redoHist.Count - 1].Item1.SetActive(!redoHist[redoHist.Count - 1].Item2);
+            redoHist.Remove(redoHist[redoHist.Count - 1]);
+        }
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            var path = StandaloneFileBrowser.OpenFilePanel("Open File", "", "png", true);
+            byte[] imgData = File.ReadAllBytes(path[0]);
+            myTexture = new Texture2D(1, 1);
+            myTexture.LoadImage(imgData);
+            GameObject.Find("Plane").GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
+            GameObject.Find("Plane").GetComponent<MeshRenderer>().material.mainTexture = myTexture;
         }
 
         if (Input.mouseScrollDelta.y != 0)
@@ -124,7 +138,7 @@ public class BuildingSystem : MonoBehaviour
                 currentObj.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
                 currentObj.layer = LayerMask.NameToLayer("World");
                 undoHist.Add(new Tuple<GameObject, bool>(currentObj, true));
-                foreach(Tuple<GameObject, bool> t in redoHist) if (!t.Item2) Destroy(t.Item1);
+                foreach (Tuple<GameObject, bool> t in redoHist) if (!t.Item2) Destroy(t.Item1);
                 redoHist.Clear();
                 currentObj = null;
             }
@@ -133,7 +147,7 @@ public class BuildingSystem : MonoBehaviour
             {
                 undoHist.Add(new Tuple<GameObject, bool>(buildHit.transform.gameObject, false));
                 buildHit.transform.gameObject.SetActive(false);
-                foreach(Tuple<GameObject, bool> t in redoHist) if (!t.Item2) Destroy(t.Item1);
+                foreach (Tuple<GameObject, bool> t in redoHist) if (!t.Item2) Destroy(t.Item1);
                 redoHist.Clear();
             }
         }

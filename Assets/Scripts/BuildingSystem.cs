@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Windows;
@@ -27,14 +27,14 @@ public class BuildingSystem : MonoBehaviour
     private void Start()
     {
         objSize = prefab.GetComponent<LShape>().size;
-        Cursor.lockState = CursorLockMode.Locked;
+        SetCursorState(false);
         buildOrientation = Quaternion.identity;
     }
 
     void Update()
     {
         // Undo
-        if (Input.GetKeyDown(KeyCode.RightControl) && undoHist.Count > 0)
+        if (Input.GetKeyDown(KeyCode.W) && undoHist.Count > 0)
         {
             redoHist.Add(new Tuple<GameObject, bool>(undoHist[undoHist.Count - 1].Item1, !undoHist[undoHist.Count - 1].Item2));
             undoHist[undoHist.Count - 1].Item1.SetActive(!undoHist[undoHist.Count - 1].Item2);
@@ -42,14 +42,14 @@ public class BuildingSystem : MonoBehaviour
         }
 
         // Redo
-        if (Input.GetKeyDown(KeyCode.RightShift) && redoHist.Count > 0)
+        if (Input.GetKeyDown(KeyCode.X) && redoHist.Count > 0)
         {
             undoHist.Add(new Tuple<GameObject, bool>(redoHist[redoHist.Count - 1].Item1, !redoHist[redoHist.Count - 1].Item2));
             redoHist[redoHist.Count - 1].Item1.SetActive(!redoHist[redoHist.Count - 1].Item2);
             redoHist.Remove(redoHist[redoHist.Count - 1]);
         }
 
-        if (Input.GetKeyDown(KeyCode.M)) loadImage();
+        if (Input.GetKeyDown(KeyCode.I)) loadImage();
 
         if (Input.mouseScrollDelta.y != 0)
         {
@@ -134,7 +134,7 @@ public class BuildingSystem : MonoBehaviour
                 currentObj = null;
             }
 
-            if (Input.GetMouseButtonDown(1) && buildHit.transform != null)
+            if (Input.GetMouseButtonDown(1) && buildHit.transform != null && buildHit.transform.tag != "Indestructible")
             {
                 undoHist.Add(new Tuple<GameObject, bool>(buildHit.transform.gameObject, false));
                 buildHit.transform.gameObject.SetActive(false);
@@ -177,20 +177,23 @@ public class BuildingSystem : MonoBehaviour
         }
     }
 
-	private void loadImage()
-	{
-		var extensions = new[] {
-			new ExtensionFilter("Images ", "png", "jpg", "jpeg"),
-			new ExtensionFilter("Tous les fichiers ", "*"),
-		};
-		var path = StandaloneFileBrowser.OpenFilePanel("Choisir une image", "", extensions, true);
-		if (path.Length <= 0) return;
-		byte[] imgData = File.ReadAllBytes(path[0]);
-		myTexture = new Texture2D(1, 1);
-		myTexture.LoadImage(imgData);
-		GameObject.Find("Plane").GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
-		GameObject.Find("Plane").GetComponent<MeshRenderer>().material.mainTexture = myTexture;
-	}
+    private void loadImage()
+    {
+        SetCursorState(true);
+        var extensions = new[] {
+            new ExtensionFilter("Images ", "png", "jpg", "jpeg"),
+            new ExtensionFilter("Tous les fichiers ", "*"),
+        };
+        var path = StandaloneFileBrowser.OpenFilePanel("Choisir une image", "", extensions, true);
+        SetCursorState(false);
+        
+        if (path.Length <= 0) return;
+        byte[] imgData = System.IO.File.ReadAllBytes(path[0]);
+        myTexture = new Texture2D(1, 1);
+        myTexture.LoadImage(imgData);
+        GameObject.Find("Plane").GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
+        GameObject.Find("Plane").GetComponent<MeshRenderer>().material.mainTexture = myTexture;
+    }
 
     private void OnDrawGizmos()
     {
@@ -200,6 +203,15 @@ public class BuildingSystem : MonoBehaviour
             LShape lShape = currentObj.GetComponent<LShape>();
             Gizmos.DrawWireCube(currentObj.transform.position, lShape.size);
         }
+    }
+
+    private void SetCursorState(bool enable)
+    {
+        if (enable)
+            Cursor.lockState = CursorLockMode.None;
+        else
+            Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = enable;
     }
 
 }

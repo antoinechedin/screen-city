@@ -26,7 +26,6 @@ public class BuildingSystem : MonoBehaviour
 
     private void Start()
     {
-        prefab.GetComponent<LShape>().size = new Vector3(1f, 1f, 1f);
         objSize = prefab.GetComponent<LShape>().size;
         Cursor.lockState = CursorLockMode.Locked;
         buildOrientation = Quaternion.identity;
@@ -50,15 +49,7 @@ public class BuildingSystem : MonoBehaviour
             redoHist.Remove(redoHist[redoHist.Count - 1]);
         }
 
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            var path = StandaloneFileBrowser.OpenFilePanel("Open File", "", "png", true);
-            byte[] imgData = File.ReadAllBytes(path[0]);
-            myTexture = new Texture2D(1, 1);
-            myTexture.LoadImage(imgData);
-            GameObject.Find("Plane").GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
-            GameObject.Find("Plane").GetComponent<MeshRenderer>().material.mainTexture = myTexture;
-        }
+        if (Input.GetKeyDown(KeyCode.M)) loadImage();
 
         if (Input.mouseScrollDelta.y != 0)
         {
@@ -185,6 +176,21 @@ public class BuildingSystem : MonoBehaviour
             obj.GetComponent<MeshRenderer>().material = buildMaterial;
         }
     }
+
+	private void loadImage()
+	{
+		var extensions = new[] {
+			new ExtensionFilter("Images ", "png", "jpg", "jpeg"),
+			new ExtensionFilter("Tous les fichiers ", "*"),
+		};
+		var path = StandaloneFileBrowser.OpenFilePanel("Choisir une image", "", extensions, true);
+		if (path.Length <= 0) return;
+		byte[] imgData = File.ReadAllBytes(path[0]);
+		myTexture = new Texture2D(1, 1);
+		myTexture.LoadImage(imgData);
+		GameObject.Find("Plane").GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
+		GameObject.Find("Plane").GetComponent<MeshRenderer>().material.mainTexture = myTexture;
+	}
 
     private void OnDrawGizmos()
     {

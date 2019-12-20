@@ -821,6 +821,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 450665584920920688, guid: f5b2c44fdacffaa4cb073b1204d0315b,
+        type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 507305455}
     - target: {fileID: 450665584920920701, guid: f5b2c44fdacffaa4cb073b1204d0315b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -925,33 +930,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 450665584920920688, guid: f5b2c44fdacffaa4cb073b1204d0315b,
-        type: 3}
-      propertyPath: m_Camera
-      value: 
-      objectReference: {fileID: 507305455}
-    - target: {fileID: 1035943198, guid: f5b2c44fdacffaa4cb073b1204d0315b, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 3.2000122
-      objectReference: {fileID: 0}
-    - target: {fileID: 1035943198, guid: f5b2c44fdacffaa4cb073b1204d0315b, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: -34.6
-      objectReference: {fileID: 0}
-    - target: {fileID: 1035943198, guid: f5b2c44fdacffaa4cb073b1204d0315b, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: -30.200012
-      objectReference: {fileID: 0}
-    - target: {fileID: 1035943198, guid: f5b2c44fdacffaa4cb073b1204d0315b, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1035943199, guid: f5b2c44fdacffaa4cb073b1204d0315b, type: 3}
-      propertyPath: m_Text
-      value: "CONTR\xD4LES\n\xC9chap : Quitter le jeu\nZ/Q/S/D : D\xE9placement\nEspace/Ctrl
-        gauche : Monter/Descendre\nFl\xE8ches : Tourner la forme\nW/X : Annuler/R\xE9tablir\nI
-        : Charger une image pour le sol\n\nF3 : Cacher/Afficher les contr\xF4les \n"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f5b2c44fdacffaa4cb073b1204d0315b, type: 3}

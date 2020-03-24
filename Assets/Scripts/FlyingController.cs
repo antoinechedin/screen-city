@@ -31,7 +31,9 @@ public class FlyingController : MonoBehaviour
         Vector3 up = Vector3.up * Input.GetAxis("Up"); 
         Vector3 move = (forward + side + up).normalized;
 
-        characterController.Move(move * Time.deltaTime * moveSpeed);   
+        float currentMoveSpeed = Input.GetKey(KeyCode.LeftShift) ? moveSpeed * 3f : moveSpeed;
+
+        characterController.Move(move * Time.deltaTime * currentMoveSpeed);   
 
         // Orientation
         yaw += Input.GetAxis("Mouse X") * rotationSpeed;

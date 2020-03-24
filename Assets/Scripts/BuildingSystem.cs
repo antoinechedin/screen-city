@@ -18,7 +18,7 @@ public class BuildingSystem : MonoBehaviour
     GameObject currentObj;
     private Vector3 objSize;
     bool canBuild;
-    private bool sizingX = true, sizingY = true, sizingZ = true;
+    public bool sizingX = true, sizingY = true, sizingZ = true;
     private List<Tuple<GameObject, bool>> undoHist = new List<Tuple<GameObject, bool>>();
     private List<Tuple<GameObject, bool>> redoHist = new List<Tuple<GameObject, bool>>();
     private Texture2D myTexture;
@@ -67,9 +67,9 @@ public class BuildingSystem : MonoBehaviour
             UpdateObjSize();
         }
 
-        if (Input.GetKeyDown(KeyCode.Keypad1)) sizingX = !sizingX;
-        if (Input.GetKeyDown(KeyCode.Keypad2)) sizingY = !sizingY;
-        if (Input.GetKeyDown(KeyCode.Keypad3)) sizingZ = !sizingZ;
+        if (Input.GetKeyDown(KeyCode.K)) sizingX = !sizingX;
+        if (Input.GetKeyDown(KeyCode.L)) sizingY = !sizingY;
+        if (Input.GetKeyDown(KeyCode.M)) sizingZ = !sizingZ;
 
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {

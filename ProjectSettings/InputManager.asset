@@ -297,10 +297,10 @@ InputManager:
     m_Name: Up
     descriptiveName: 
     descriptiveNegativeName: 
-    negativeButton: left ctrl
-    positiveButton: space
-    altNegativeButton: a
-    altPositiveButton: e
+    negativeButton: a
+    positiveButton: e
+    altNegativeButton: 
+    altPositiveButton: 
     gravity: 1000
     dead: 0.001
     sensitivity: 3

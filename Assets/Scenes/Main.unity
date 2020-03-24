@@ -14034,6 +14034,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: BoidSpawner
       objectReference: {fileID: 0}
+    - target: {fileID: 3695273596615377951, guid: 46d87a2b156ae24489cf51fc9106a4c1,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1672513706122535, guid: 46d87a2b156ae24489cf51fc9106a4c1, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

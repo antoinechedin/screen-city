@@ -80,7 +80,7 @@ MonoBehaviour:
     : Monter/Descendre\nShift gauche : Acc\xE9l\xE9rer\nClique gauche/droit : Poser/Supprimer
     un L\nFl\xE8ches : Tourner la forme\nMolette : Agrandir/R\xE9tr\xE9cir la forme\nK/L/M
     : Activer/D\xE9sactivation de la molette sur l'axe X/Y/Z\nW/X : Annuler/R\xE9tablir\nI
-    : Charger une image pour le sol\n\nF3 : Cacher/Afficher les contr\xF4les "
+    : Charger une image pour le sol\n\nP : Cacher/Afficher les contr\xF4les "
 --- !u!1 &30376294848881587
 GameObject:
   m_ObjectHideFlags: 0

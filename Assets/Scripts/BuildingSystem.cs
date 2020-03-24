@@ -193,7 +193,7 @@ public class BuildingSystem : MonoBehaviour
         byte[] imgData = System.IO.File.ReadAllBytes(path[0]);
         myTexture = new Texture2D(1, 1);
         myTexture.LoadImage(imgData);
-        screen.GetComponent<MeshRenderer>().material = new Material(Shader.Find("StandardDoubleSide"));
+        screen.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
         screen.GetComponent<MeshRenderer>().material.mainTexture = myTexture;
     }
 

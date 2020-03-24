@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
             Application.Quit();
         }
 
-        if (Input.GetKeyDown(KeyCode.F3) && canvas != null)
+        if (Input.GetKeyDown(KeyCode.P) && canvas != null)
         {
             Transform controls = canvas.transform.Find("Controls");
             if (controls != null)

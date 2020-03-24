@@ -9,6 +9,7 @@ using SFB;
 public class BuildingSystem : MonoBehaviour
 {
     public GameObject prefab;
+    public GameObject Screen;
     public Material buildMaterial;
     public Material cantBuildMaterial;
     public LayerMask worldMask;
@@ -48,8 +49,6 @@ public class BuildingSystem : MonoBehaviour
             redoHist[redoHist.Count - 1].Item1.SetActive(!redoHist[redoHist.Count - 1].Item2);
             redoHist.Remove(redoHist[redoHist.Count - 1]);
         }
-
-        if (Input.GetKeyDown(KeyCode.I)) loadImage();
 
         if (Input.mouseScrollDelta.y != 0)
         {
@@ -92,6 +91,9 @@ public class BuildingSystem : MonoBehaviour
         RaycastHit buildHit;
         if (Physics.Raycast(transform.position, transform.forward, out buildHit, buildDistance, worldMask))
         {
+            if (Input.GetKeyDown(KeyCode.I) && buildHit.collider.gameObject.tag == "Screen")
+                loadImage(buildHit.collider.gameObject);
+
             if (currentObj == null)
             {
                 currentObj = Instantiate(prefab);
@@ -177,7 +179,7 @@ public class BuildingSystem : MonoBehaviour
         }
     }
 
-    private void loadImage()
+    private void loadImage(GameObject screen)
     {
         SetCursorState(true);
         var extensions = new[] {
@@ -186,13 +188,13 @@ public class BuildingSystem : MonoBehaviour
         };
         var path = StandaloneFileBrowser.OpenFilePanel("Choisir une image", "", extensions, true);
         SetCursorState(false);
-        
+
         if (path.Length <= 0) return;
         byte[] imgData = System.IO.File.ReadAllBytes(path[0]);
         myTexture = new Texture2D(1, 1);
         myTexture.LoadImage(imgData);
-        GameObject.Find("Plane").GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
-        GameObject.Find("Plane").GetComponent<MeshRenderer>().material.mainTexture = myTexture;
+        screen.GetComponent<MeshRenderer>().material = new Material(Shader.Find("StandardDoubleSide"));
+        screen.GetComponent<MeshRenderer>().material.mainTexture = myTexture;
     }
 
     private void OnDrawGizmos()

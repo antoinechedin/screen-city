@@ -9,6 +9,7 @@ using SFB;
 public class BuildingSystem : MonoBehaviour
 {
     public GameObject prefab;
+    public GameObject Screen;
     public Material buildMaterial;
     public Material cantBuildMaterial;
     public LayerMask worldMask;
@@ -17,7 +18,7 @@ public class BuildingSystem : MonoBehaviour
     GameObject currentObj;
     private Vector3 objSize;
     bool canBuild;
-    private bool sizingX = true, sizingY = true, sizingZ = true;
+    public bool sizingX = true, sizingY = true, sizingZ = true;
     private List<Tuple<GameObject, bool>> undoHist = new List<Tuple<GameObject, bool>>();
     private List<Tuple<GameObject, bool>> redoHist = new List<Tuple<GameObject, bool>>();
     private Texture2D myTexture;
@@ -49,8 +50,6 @@ public class BuildingSystem : MonoBehaviour
             redoHist.Remove(redoHist[redoHist.Count - 1]);
         }
 
-        if (Input.GetKeyDown(KeyCode.I)) loadImage();
-
         if (Input.mouseScrollDelta.y != 0)
         {
             if (Input.mouseScrollDelta.y > 0)
@@ -68,9 +67,9 @@ public class BuildingSystem : MonoBehaviour
             UpdateObjSize();
         }
 
-        if (Input.GetKeyDown(KeyCode.Keypad1)) sizingX = !sizingX;
-        if (Input.GetKeyDown(KeyCode.Keypad2)) sizingY = !sizingY;
-        if (Input.GetKeyDown(KeyCode.Keypad3)) sizingZ = !sizingZ;
+        if (Input.GetKeyDown(KeyCode.K)) sizingX = !sizingX;
+        if (Input.GetKeyDown(KeyCode.L)) sizingY = !sizingY;
+        if (Input.GetKeyDown(KeyCode.M)) sizingZ = !sizingZ;
 
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
@@ -92,6 +91,9 @@ public class BuildingSystem : MonoBehaviour
         RaycastHit buildHit;
         if (Physics.Raycast(transform.position, transform.forward, out buildHit, buildDistance, worldMask))
         {
+            if (Input.GetKeyDown(KeyCode.I) && buildHit.collider.gameObject.tag == "Screen")
+                loadImage(buildHit.collider.gameObject);
+
             if (currentObj == null)
             {
                 currentObj = Instantiate(prefab);
@@ -177,7 +179,7 @@ public class BuildingSystem : MonoBehaviour
         }
     }
 
-    private void loadImage()
+    private void loadImage(GameObject screen)
     {
         SetCursorState(true);
         var extensions = new[] {
@@ -186,13 +188,13 @@ public class BuildingSystem : MonoBehaviour
         };
         var path = StandaloneFileBrowser.OpenFilePanel("Choisir une image", "", extensions, true);
         SetCursorState(false);
-        
+
         if (path.Length <= 0) return;
         byte[] imgData = System.IO.File.ReadAllBytes(path[0]);
         myTexture = new Texture2D(1, 1);
         myTexture.LoadImage(imgData);
-        GameObject.Find("Plane").GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
-        GameObject.Find("Plane").GetComponent<MeshRenderer>().material.mainTexture = myTexture;
+        screen.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"));
+        screen.GetComponent<MeshRenderer>().material.mainTexture = myTexture;
     }
 
     private void OnDrawGizmos()

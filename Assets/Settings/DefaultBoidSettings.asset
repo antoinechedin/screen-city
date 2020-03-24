@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DefaultBoidSettings
   m_EditorClassIdentifier: 
   minSpeed: 5
-  maxSpeed: 7
+  maxSpeed: 10
   perceptionRadius: 3
   avoidanceRadius: 2
   maxSteerForce: 2
